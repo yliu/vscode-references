@@ -1,6 +1,6 @@
 # References VS Code Extension
 
-![Example Image](./resources/example1.png)
+![Example Image](resources/example1.png)
 
 ## Overview
 
@@ -44,7 +44,7 @@ To contribute to the development of this extension:
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](./LICENSE.md) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE.md) file for details.
 
 ## Contributing
 
