@@ -1,8 +1,8 @@
 {
   "name": "references",
   "displayName": "References",
-  "description": "references search (beta)",
-  "version": "1.0.9",
+  "description": "Search and track references in your codebase",
+  "version": "1.0.10",
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -13,6 +13,7 @@
   "icon": "resources/icon.png",
   "publisher": "timliu",
   "activationEvents": [
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -43,14 +44,14 @@
       }
     ],
     "viewsContainers": {
-			"activitybar": [
-				{
-					"id": "references",
-					"title": "References",
-					"icon": "$(references)"
-				}
-			]
-		},
+      "activitybar": [
+        {
+          "id": "references",
+          "title": "References",
+          "icon": "$(references)"
+        }
+      ]
+    },
     "views": {
       "references": [
         {
@@ -99,12 +100,13 @@
     ],
     "keybindings": [
       {
-          "command": "references.listReferences",
-          "key": "ctrl+alt+r",
-          "mac": "cmd+r"
+        "command": "references.listReferences",
+        "key": "ctrl+alt+r",
+        "mac": "cmd+r"
       }
     ],
     "configuration": {
+      "title": "References",
       "properties": {
         "references.globalExecutable": {
           "type": "string",
@@ -121,17 +123,15 @@
         "references.completion": {
           "type": "string",
           "enum": [
-              "Enabled",
-              "Disabled"
+            "Enabled",
+            "Disabled"
           ],
           "default": "Disabled",
           "scope": "resource",
           "description": "(Experimental) Enable/disable auto-completion feature"
         },
         "references.unused": {
-          "type": [
-            "string"
-          ],
+          "type": "string",
           "default": "",
           "scope": "resource",
           "description": "(Experimental) Used to open settings.json"
@@ -161,5 +161,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/yliu/vscode-references.git"
-  }  
+  }
 }

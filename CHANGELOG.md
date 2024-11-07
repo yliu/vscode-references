@@ -2,8 +2,20 @@
 
 All notable changes to the "references" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [1.0.10]
 
-## [Unreleased]
-
-- Initial release
+### Features
+- Tree view for visualizing references in a structured format
+- Reference searching using GNU Global and Universal Ctags
+- Structured tree view for reference visualization
+- Activity bar integration
+- Context menu integration
+- Command palette integration for easy access to commands
+- Keyboard shortcuts: Ctrl+Alt+R (Windows/Linux) or Cmd+R (macOS) to list references
+- Configuration options for GNU Global and Universal Ctags executables
+- Commands:
+  - References: List References
+  - References: Add
+  - References: Remove
+  - References: Clear
+  - References: Show Information
