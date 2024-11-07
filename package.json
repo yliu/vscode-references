@@ -1,0 +1,165 @@
+{
+  "name": "references",
+  "displayName": "References",
+  "description": "references search (beta)",
+  "version": "1.0.9",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Debuggers"
+  ],
+  "icon": "resources/icon.png",
+  "publisher": "timliu",
+  "activationEvents": [
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "references.showInfo",
+        "title": "Show Information",
+        "icon": "$(info)"
+      },
+      {
+        "command": "references.listReferences",
+        "title": "List References"
+      },
+      {
+        "command": "references.removeItem",
+        "title": "Remove",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "references.addItem",
+        "title": "Add",
+        "icon": "$(add)"
+      },
+      {
+        "command": "references.clearItems",
+        "title": "Clear",
+        "icon": "$(clear-all)"
+      }
+    ],
+    "viewsContainers": {
+			"activitybar": [
+				{
+					"id": "references",
+					"title": "References",
+					"icon": "$(references)"
+				}
+			]
+		},
+    "views": {
+      "references": [
+        {
+          "id": "references.references",
+          "name": "References"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "references.clearItems",
+          "when": "view == references.references",
+          "group": "navigation"
+        },
+        {
+          "command": "references.addItem",
+          "when": "view == references.references",
+          "group": "navigation"
+        },
+        {
+          "command": "references.showInfo",
+          "when": "view == references.references",
+          "group": "inline"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "references.removeItem",
+          "when": "viewItem == treeItemCouldBeRemoved",
+          "group": "inline"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "references.listReferences",
+          "group": "0__references"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "references.references",
+        "contents": "[Search Symbol](command:references.addItem)"
+      }
+    ],
+    "keybindings": [
+      {
+          "command": "references.listReferences",
+          "key": "ctrl+alt+r",
+          "mac": "cmd+r"
+      }
+    ],
+    "configuration": {
+      "properties": {
+        "references.globalExecutable": {
+          "type": "string",
+          "default": "global",
+          "scope": "resource",
+          "description": "Specify the path to the global. (Default: \"global\")"
+        },
+        "references.ctagsExecutable": {
+          "type": "string",
+          "default": "ctags",
+          "scope": "resource",
+          "description": "Specify the path to the ctags. (Default: \"ctags\")"
+        },
+        "references.completion": {
+          "type": "string",
+          "enum": [
+              "Enabled",
+              "Disabled"
+          ],
+          "default": "Disabled",
+          "scope": "resource",
+          "description": "(Experimental) Enable/disable auto-completion feature"
+        },
+        "references.unused": {
+          "type": [
+            "string"
+          ],
+          "default": "",
+          "scope": "resource",
+          "description": "(Experimental) Used to open settings.json"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.80.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@typescript-eslint/eslint-plugin": "^7.7.1",
+    "@typescript-eslint/parser": "^7.7.1",
+    "eslint": "^8.57.0",
+    "typescript": "^5.4.5",
+    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.3.9"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yliu/vscode-references.git"
+  }  
+}
