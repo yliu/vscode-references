@@ -2,6 +2,12 @@
 
 All notable changes to the "references" extension will be documented in this file.
 
+## [1.0.11]
+
+### Features
+- Support goto definition in the extension
+- Added configuration option to suppress warning notifications
+
 ## [1.0.10]
 
 ### Features
