@@ -56,6 +56,39 @@ class ReferencesCompletionItemProvider implements vscode.CompletionItemProvider 
     }
 }
 
+class ReferencesDefinitionProvider implements vscode.DefinitionProvider {
+    constructor() {}
+
+    provideDefinition(
+        document: vscode.TextDocument,
+        position: vscode.Position,
+        token: vscode.CancellationToken
+    ): vscode.ProviderResult<vscode.Definition> {
+        return new Promise<vscode.Location[]>((resolve, reject) => {
+            const cwd = vscode.workspace.workspaceFolders?.[0].uri.path;
+            if (!cwd) return [];
+            
+            const symbol = document.getText(document.getWordRangeAtPosition(position));
+            const reGlobal = /(\S+)\s+(\d+)\s+(\S+) (.*)/g;
+            const data = getDefinitions(symbol, cwd, reGlobal);
+            const locations = data.map(item => {
+                const ref = new Reference(item.tag, item.filename, item.line, item.type, item.tag, item.content, false, false, item.kind);
+                return new vscode.Location(
+                    vscode.Uri.file(path.join(cwd, item.filename)),
+                    ref.calculateRange()
+                );
+            });
+
+            try {
+                return resolve(locations);
+            } catch (e) {
+                return reject(e);
+            }
+        });
+    }
+}
+
+
 // Provides the tree view of references
 class ReferencesProvider implements vscode.TreeDataProvider<Reference> {
     private symbols: Reference[] = [];
@@ -69,23 +102,8 @@ class ReferencesProvider implements vscode.TreeDataProvider<Reference> {
             return element;
         }
 
-        const range = this.calculateRange(element);
-        element.command = this.createOpenCommand(element, range);
+        element.command = this.createOpenCommand(element, element.calculateRange());
         return element;
-    }
-
-    private calculateRange(element: Reference): vscode.Range {
-        let start = element.content.indexOf(element.tag);
-        if (start < 0) {
-            start = 0;
-            console.warn("References Warning: gtags might be out of date, run `global -u` to update gtags.");
-        }
-        const end = start + element.tag.length;
-
-        return new vscode.Range(
-            new vscode.Position(element.line - 1, start),
-            new vscode.Position(element.line - 1, end)
-        );
     }
 
     private createOpenCommand(element: Reference, range: vscode.Range): vscode.Command {
@@ -267,6 +285,20 @@ class Reference extends vscode.TreeItem {
         if (this.type === 'referencedBy') return 'symbolIcon.fieldForeground';
         return 'titleBar.inactiveForeground';
     }
+
+    calculateRange(): vscode.Range {
+        let start = this.content.indexOf(this.tag);
+        if (start < 0) {
+            start = 0;
+            console.warn("References Warning: gtags might be out of date, run `global -u` to update gtags.");
+        }
+        const end = start + this.tag.length;
+
+        return new vscode.Range(
+            new vscode.Position(this.line - 1, start),
+            new vscode.Position(this.line - 1, end)
+        );
+    }
 }
 
 // Utility functions
@@ -443,6 +475,14 @@ export function activate(context: vscode.ExtensionContext) {
     const treeView = vscode.window.createTreeView('references.references', {
         treeDataProvider
     });
+
+    const definitionProvider = new ReferencesDefinitionProvider();
+    context.subscriptions.push(
+        vscode.languages.registerDefinitionProvider(
+            { scheme: 'file' },
+            definitionProvider
+        )
+    );
 
     registerCommands(context, treeDataProvider, treeView);
 
