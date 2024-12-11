@@ -323,7 +323,7 @@ function preCheck() {
 function checkGlobalInstallation() {
     p.exec(`${global()} --version`, (error, stdout, stderr) => {
         if (error) {
-            vscode.window.showInformationMessage('GNU Global is required for this extension. ' + stderr);
+            showNotification('GNU Global is required for this extension. ' + stderr);
         }
     });
 }
@@ -331,9 +331,9 @@ function checkGlobalInstallation() {
 function checkCtagsInstallation() {
     p.exec(`${ctags()} --version`, (error, stdout, stderr) => {
         if (error) {
-            vscode.window.showInformationMessage('universal-ctags is required for this extension. ' + stderr);
+            showNotification('universal-ctags is required for this extension. ' + stderr);
         } else if (!stdout.match(/Universal Ctags/)) {
-            vscode.window.showInformationMessage('universal-ctags is required for this extension.');
+            showNotification('universal-ctags is required for this extension.');
         }
     });
 }
@@ -344,11 +344,26 @@ function checkGtagsFile() {
 
     fs.stat(path.join(cwd, 'GTAGS'), (err, stat) => {
         if (err?.code === 'ENOENT') {
-            vscode.window.showInformationMessage(
-                'GTAGS is not generated, use "gtags" to generate tag files for global.'
-            );
+            showNotification('GTAGS is not generated, use "gtags" to generate tag files for global.')
         } else if (err) {
             p.exec(`${global()} -u`, {cwd});
+        }
+    });
+}
+
+function showNotification(message: string) {
+    if (vscode.workspace.getConfiguration().get<boolean>('references.notShowWarnings')) {
+        return;
+    }
+    const close = 'Close';
+    const turnOff = 'Turn Off Further Warnings';
+    vscode.window.showInformationMessage(
+        message,
+        close,
+        turnOff,
+    ).then(selection => {
+        if (selection === turnOff) {
+            vscode.workspace.getConfiguration().update('references.notShowWarnings', true, true);
         }
     });
 }
