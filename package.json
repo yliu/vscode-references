@@ -2,7 +2,7 @@
   "name": "references",
   "displayName": "References",
   "description": "Search and track references in your codebase",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -121,14 +121,10 @@
           "description": "Specify the path to the ctags. (Default: \"ctags\")"
         },
         "references.completion": {
-          "type": "string",
-          "enum": [
-            "Enabled",
-            "Disabled"
-          ],
-          "default": "Disabled",
+          "type": "boolean",
+          "default": false,
           "scope": "resource",
-          "description": "(Experimental) Enable/disable auto-completion feature"
+          "description": "(Experimental) Enable auto-completion feature"
         },
         "references.notShowWarnings": {
           "type": "boolean",

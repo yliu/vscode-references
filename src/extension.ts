@@ -311,7 +311,7 @@ function ctags(): string {
 }
 
 function isCompletion(): boolean {
-    return vscode.workspace.getConfiguration().get<string>('references.completion') === 'Enabled';
+    return vscode.workspace.getConfiguration().get<boolean>('references.completion') ?? false;
 }
 
 function preCheck() {
