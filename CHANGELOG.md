@@ -2,6 +2,15 @@
 
 All notable changes to the "references" extension will be documented in this file.
 
+## [1.0.12]
+
+### Features
+- Support c/cpp symbol outline
+
+### Changes
+- Refactor file structure
+- Prettier ts files
+
 ## [1.0.11]
 
 ### Features
