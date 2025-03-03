@@ -2,6 +2,11 @@
 
 All notable changes to the "references" extension will be documented in this file.
 
+## [1.0.13]
+
+## Changes
+- Fix symbol range 
+
 ## [1.0.12]
 
 ### Features
