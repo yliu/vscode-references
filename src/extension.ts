@@ -3,6 +3,7 @@ import { Reference } from './references-treeitem';
 import { ReferencesProvider } from './references-treedata-provider';
 import { ReferencesDefinitionProvider } from './references-definition-provider';
 import { ReferencesCompletionItemProvider } from './references-completion-item-provider';
+import { ReferencesDocumentSymbolProvider } from './references-document-symbol-provider';
 import { preCheck, isCompletion } from './references-utils';
 
 // Extension activation and deactivation
@@ -26,6 +27,8 @@ export function activate(context: vscode.ExtensionContext) {
     if (isCompletion()) {
         registerCompletionProvider(context);
     }
+
+    registerDocumentSymbolProvider(context);
 }
 
 async function handleShowInfo() {
@@ -87,6 +90,16 @@ function registerCompletionProvider(context: vscode.ExtensionContext) {
     ];
     const provider = new ReferencesCompletionItemProvider();
     const disposable = vscode.languages.registerCompletionItemProvider(selector, provider);
+    context.subscriptions.push(disposable);
+}
+
+function registerDocumentSymbolProvider(context: vscode.ExtensionContext) {
+    const selector = [
+        { scheme: 'file', language: 'c' },
+        { scheme: 'file', language: 'cpp' },
+    ];
+    const provider = new ReferencesDocumentSymbolProvider();
+    const disposable = vscode.languages.registerDocumentSymbolProvider(selector, provider);
     context.subscriptions.push(disposable);
 }
 

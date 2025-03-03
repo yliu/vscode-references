@@ -10,7 +10,7 @@ export function global(): string {
     );
 }
 
-function ctags(): string {
+export function ctags(): string {
     return vscode.workspace.getConfiguration().get<string>('references.ctagsExecutable') || 'ctags';
 }
 
@@ -87,6 +87,18 @@ export function getGtagsReferences(symbol: string): any[] {
     return data;
 }
 
+export function getGtagsFileSymbols(filename: string): any[] {
+    const cwd = vscode.workspace.workspaceFolders?.[0].uri.path;
+    if (!cwd) return [];
+
+    const reGlobal = /(\S+)\s+(\d+)\s+(\S+) (.*)/g;
+    const output = p.execSync(`${global()} -xf ${filename}`, { cwd });
+    const data = parseGlobalOutput(output, reGlobal, 'symbols');
+
+    enrichDataWithCtagsInfo(data, cwd);
+    return data;
+}
+
 export function getDefinitions(symbol: string, cwd: string, regex: RegExp): any[] {
     const output = p.execSync(`${global()} -x ${symbol}`, { cwd });
     return parseGlobalOutput(output, regex, 'definition');
@@ -145,8 +157,8 @@ function buildFileSymbolMap(data: any[], cwd: string): Record<string, any[]> {
     return fileMap;
 }
 
-function parseCtagsOutput(output: Buffer): any[] {
-    const reCtags = /(\S+)\t([^\t]+)\t\/\^(.*)\$?\/;"\t(\S+)\t?(.*)/g;
+export function parseCtagsOutput(output: Buffer): any[] {
+    const reCtags = /(\S+)\t([^\t]+)\t\/\^(.*?)\$?\/;"\t(\S+)\t?(.*)/g;
     return [...output.toString().matchAll(reCtags)].map((item) => {
         const obj: any = {
             name: item[1],
