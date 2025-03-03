@@ -27,7 +27,6 @@ export class ReferencesDocumentSymbolProvider implements vscode.DocumentSymbolPr
         });
         const ctagsSymbol = parseCtagsOutput(ctagsOut);
         ctagsSymbol.forEach((item) => {
-            console.log(item)
             if ('struct' in item) {
                 return
             }
@@ -37,6 +36,10 @@ export class ReferencesDocumentSymbolProvider implements vscode.DocumentSymbolPr
             }
             const end = start + item.name.length;
             const symbolRange = new vscode.Range(
+                new vscode.Position(item.line - 1, 0),
+                new vscode.Position(item.end, 0),
+            );
+            const selectionRange = new vscode.Range(
                 new vscode.Position(item.line - 1, start),
                 new vscode.Position(item.line - 1, end),
             );
@@ -46,7 +49,7 @@ export class ReferencesDocumentSymbolProvider implements vscode.DocumentSymbolPr
                 item.content,
                 symbolMap[item.kind],
                 symbolRange,
-                symbolRange,
+                selectionRange,
             );
             symbols.push(symbol);
         });
