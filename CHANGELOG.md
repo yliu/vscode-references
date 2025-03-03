@@ -4,7 +4,7 @@ All notable changes to the "references" extension will be documented in this fil
 
 ## [1.0.13]
 
-## Changes
+### Changes
 - Fix symbol range 
 
 ## [1.0.12]
