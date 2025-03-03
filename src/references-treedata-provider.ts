@@ -1,8 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { Reference } from './references-treeitem';
-import { getGtagsReferences } from './references-utils'
-
+import { getGtagsReferences } from './references-utils';
 
 // Provides the tree view of references
 export class ReferencesProvider implements vscode.TreeDataProvider<Reference> {
@@ -27,8 +26,11 @@ export class ReferencesProvider implements vscode.TreeDataProvider<Reference> {
             title: 'Open Call',
             arguments: [
                 vscode.Uri.file(path.join(this.workspaceRoot, element.filename)),
-                { selection: range, preserveFocus: true } as vscode.TextDocumentShowOptions
-            ]
+                {
+                    selection: range,
+                    preserveFocus: true,
+                } as vscode.TextDocumentShowOptions,
+            ],
         };
     }
 
@@ -45,7 +47,7 @@ export class ReferencesProvider implements vscode.TreeDataProvider<Reference> {
         if (element) {
             return Promise.resolve(this.getReferences(element));
         }
-        
+
         return Promise.resolve(this.symbols);
     }
 
@@ -54,33 +56,26 @@ export class ReferencesProvider implements vscode.TreeDataProvider<Reference> {
         const hasRegex = symbolTag.includes('*') || symbolTag.includes('?');
 
         const references = getGtagsReferences(symbolTag);
-        
-        if (isRoot && !references.some(x => x.type === 'definition')) {
-            return [new Reference(
-                symbolTag,
-                '',
-                0,
-                'symbol',
-                symbolTag,
-                '',
-                true,
-                true,
-                'macro'
-            )];
+
+        if (isRoot && !references.some((x) => x.type === 'definition')) {
+            return [new Reference(symbolTag, '', 0, 'symbol', symbolTag, '', true, true, 'macro')];
         }
 
         return references
-            .filter(elem => {
+            .filter((elem) => {
                 if (isRoot && elem.type !== 'definition') return false;
-                if (symbol instanceof Reference && 
-                    symbol.filename === elem.filename && 
-                    symbol.line === elem.line) return false;
+                if (
+                    symbol instanceof Reference &&
+                    symbol.filename === elem.filename &&
+                    symbol.line === elem.line
+                )
+                    return false;
                 return true;
             })
             .map((elem, index, array) => {
-                const expanded = isRoot && !hasRegex && array.length === 1 || false;
+                const expanded = (isRoot && !hasRegex && array.length === 1) || false;
                 const label = this.determineLabel(elem);
-                
+
                 return new Reference(
                     label,
                     elem.filename,
@@ -90,7 +85,7 @@ export class ReferencesProvider implements vscode.TreeDataProvider<Reference> {
                     elem.content,
                     isRoot || false,
                     expanded,
-                    elem.kind
+                    elem.kind,
                 );
             });
     }
@@ -107,15 +102,15 @@ export class ReferencesProvider implements vscode.TreeDataProvider<Reference> {
             vscode.window.showInformationMessage(`No references found for "${symbol}"`);
             return undefined;
         }
-        
+
         this.symbols = newSymbols.concat(this.symbols);
         this.refresh();
         return newSymbols[0];
     }
 
     removeSymbol(ref: Reference) {
-        this.symbols = this.symbols.filter(item => 
-            item.filename !== ref.filename || item.line !== ref.line
+        this.symbols = this.symbols.filter(
+            (item) => item.filename !== ref.filename || item.line !== ref.line,
         );
         this.refresh();
     }
@@ -126,6 +121,6 @@ export class ReferencesProvider implements vscode.TreeDataProvider<Reference> {
     }
 
     refresh() {
-        this._onDidChangeTreeData.fire();
+        this._onDidChangeTreeData.fire(undefined);
     }
 }

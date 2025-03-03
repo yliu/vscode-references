@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
-
 // Represents a single reference item in the tree
 export class Reference extends vscode.TreeItem {
     constructor(
@@ -46,7 +45,7 @@ export class Reference extends vscode.TreeItem {
 
     private setupContextValue() {
         if (this.isRoot) {
-            this.contextValue = "treeItemCouldBeRemoved";
+            this.contextValue = 'treeItemCouldBeRemoved';
         }
     }
 
@@ -63,7 +62,7 @@ export class Reference extends vscode.TreeItem {
 
         const color = this.getIconColor();
         const icon = this.kind in iconMap ? iconMap[this.kind] : 'symbol-method';
-        
+
         this.iconPath = new vscode.ThemeIcon(icon, new vscode.ThemeColor(color));
     }
 
@@ -77,13 +76,15 @@ export class Reference extends vscode.TreeItem {
         let start = this.content.indexOf(this.tag);
         if (start < 0) {
             start = 0;
-            console.warn("References Warning: gtags might be out of date, run `global -u` to update gtags.");
+            console.warn(
+                'References Warning: gtags might be out of date, run `global -u` to update gtags.',
+            );
         }
         const end = start + this.tag.length;
 
         return new vscode.Range(
             new vscode.Position(this.line - 1, start),
-            new vscode.Position(this.line - 1, end)
+            new vscode.Position(this.line - 1, end),
         );
     }
 }

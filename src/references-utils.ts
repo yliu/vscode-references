@@ -3,10 +3,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as p from 'child_process';
 
-
 // Utility functions
 export function global(): string {
-    return vscode.workspace.getConfiguration().get<string>('references.globalExecutable') || 'global';
+    return (
+        vscode.workspace.getConfiguration().get<string>('references.globalExecutable') || 'global'
+    );
 }
 
 function ctags(): string {
@@ -47,9 +48,11 @@ function checkGtagsFile() {
 
     fs.stat(path.join(cwd, 'GTAGS'), (err, stat) => {
         if (err?.code === 'ENOENT') {
-            showNotification('GTAGS is not generated, use "gtags" to generate tag files for global.')
+            showNotification(
+                'GTAGS is not generated, use "gtags" to generate tag files for global.',
+            );
         } else if (err) {
-            p.exec(`${global()} -u`, {cwd});
+            p.exec(`${global()} -u`, { cwd });
         }
     });
 }
@@ -60,11 +63,7 @@ function showNotification(message: string) {
     }
     const close = 'Close';
     const turnOff = 'Turn Off Further Warnings';
-    vscode.window.showInformationMessage(
-        message,
-        close,
-        turnOff,
-    ).then(selection => {
+    vscode.window.showInformationMessage(message, close, turnOff).then((selection) => {
         if (selection === turnOff) {
             vscode.workspace.getConfiguration().update('references.notShowWarnings', true, true);
         }
@@ -89,17 +88,17 @@ export function getGtagsReferences(symbol: string): any[] {
 }
 
 export function getDefinitions(symbol: string, cwd: string, regex: RegExp): any[] {
-    const output = p.execSync(`${global()} -x ${symbol}`, {cwd});
+    const output = p.execSync(`${global()} -x ${symbol}`, { cwd });
     return parseGlobalOutput(output, regex, 'definition');
 }
 
 function getReferences(symbol: string, cwd: string, regex: RegExp, flag: string): any[] {
-    const output = p.execSync(`${global()} -${flag} ${symbol}`, {cwd});
+    const output = p.execSync(`${global()} -${flag} ${symbol}`, { cwd });
     return parseGlobalOutput(output, regex, 'referencedBy');
 }
 
 function parseGlobalOutput(output: Buffer, regex: RegExp, type: string): any[] {
-    return [...output.toString().matchAll(regex)].map(x => ({
+    return [...output.toString().matchAll(regex)].map((x) => ({
         tag: x[1],
         line: x[2],
         filename: x[3],
@@ -107,20 +106,18 @@ function parseGlobalOutput(output: Buffer, regex: RegExp, type: string): any[] {
         type,
         function: undefined,
         kind: '',
-        extra: undefined
+        extra: undefined,
     }));
 }
 
 function enrichDataWithCtagsInfo(data: any[], cwd: string) {
     const fileMap = buildFileSymbolMap(data, cwd);
-    
+
     for (const item of data) {
         const symbols = fileMap[item.filename];
         if (!symbols) continue;
 
-        const matchingSymbol = symbols.find(s => 
-            s.line <= item.line && s.end >= item.line
-        );
+        const matchingSymbol = symbols.find((s) => s.line <= item.line && s.end >= item.line);
 
         if (matchingSymbol) {
             item.function = matchingSymbol.name;
@@ -139,10 +136,9 @@ function buildFileSymbolMap(data: any[], cwd: string): Record<string, any[]> {
         if (processedFiles.has(item.filename)) continue;
         processedFiles.add(item.filename);
 
-        const output = p.execSync(
-            `${ctags()} --fields=+neK -o - --sort=no ${item.filename}`,
-            {cwd}
-        );
+        const output = p.execSync(`${ctags()} --fields=+neK -o - --sort=no ${item.filename}`, {
+            cwd,
+        });
         fileMap[item.filename] = parseCtagsOutput(output);
     }
 
@@ -151,15 +147,15 @@ function buildFileSymbolMap(data: any[], cwd: string): Record<string, any[]> {
 
 function parseCtagsOutput(output: Buffer): any[] {
     const reCtags = /(\S+)\t([^\t]+)\t\/\^(.*)\$?\/;"\t(\S+)\t?(.*)/g;
-    return [...output.toString().matchAll(reCtags)].map(item => {
+    return [...output.toString().matchAll(reCtags)].map((item) => {
         const obj: any = {
             name: item[1],
             path: item[2],
             content: item[3],
-            kind: item[4]
+            kind: item[4],
         };
 
-        item[5].split('\t').forEach(x => {
+        item[5].split('\t').forEach((x) => {
             const [key, value] = x.split(':');
             if (key && value) {
                 obj[key] = key === 'line' || key === 'end' ? parseInt(value) : value;
