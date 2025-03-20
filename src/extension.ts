@@ -4,6 +4,7 @@ import { ReferencesProvider } from './references-treedata-provider';
 import { ReferencesDefinitionProvider } from './references-definition-provider';
 import { ReferencesCompletionItemProvider } from './references-completion-item-provider';
 import { ReferencesDocumentSymbolProvider } from './references-document-symbol-provider';
+import { ReferencesWorkspaceSymbolProvider } from './references-workspace-symbol-provider';
 import { preCheck, isCompletion } from './references-utils';
 
 // Extension activation and deactivation
@@ -29,6 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     registerDocumentSymbolProvider(context);
+    registerWorkspaceSymbolProvider(context);
 }
 
 async function handleShowInfo() {
@@ -100,6 +102,16 @@ function registerDocumentSymbolProvider(context: vscode.ExtensionContext) {
     ];
     const provider = new ReferencesDocumentSymbolProvider();
     const disposable = vscode.languages.registerDocumentSymbolProvider(selector, provider);
+    context.subscriptions.push(disposable);
+}
+
+function registerWorkspaceSymbolProvider(context: vscode.ExtensionContext) {
+    const selector = [
+        { scheme: 'file', language: 'c' },
+        { scheme: 'file', language: 'cpp' },
+    ];
+    const provider = new ReferencesWorkspaceSymbolProvider();
+    const disposable = vscode.languages.registerWorkspaceSymbolProvider(provider);
     context.subscriptions.push(disposable);
 }
 

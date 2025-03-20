@@ -2,6 +2,11 @@
 
 All notable changes to the "references" extension will be documented in this file.
 
+## [1.0.14]
+
+### Changes
+- Support symbol in workspace
+
 ## [1.0.13]
 
 ### Changes

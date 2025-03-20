@@ -2,7 +2,7 @@
   "name": "references",
   "displayName": "References",
   "description": "Search and track references in your codebase",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -56,7 +56,8 @@
       "references": [
         {
           "id": "references.references",
-          "name": "References"
+          "name": "References",
+          "icon": "$(references)"
         }
       ]
     },

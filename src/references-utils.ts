@@ -99,6 +99,21 @@ export function getGtagsFileSymbols(filename: string): any[] {
     return data;
 }
 
+export function getGtagsQuerySymbols(query: string): any[] {
+    const cwd = vscode.workspace.workspaceFolders?.[0].uri.path;
+    if (!cwd) return [];
+
+    const queryString = query.replace(/[^a-zA-Z0-9_]/g, "").split("").join(".*")
+    const reGlobal = /(\S+)\s+(\d+)\s+(\S+) (.*)/g;
+    const output = p.execSync(`${global()} -ix ${queryString}`, { cwd, maxBuffer: 10 * 1024 * 1024 });
+    const data = parseGlobalOutput(output, reGlobal, 'symbols');
+
+    if (data.length < 512) { // for better performance
+        enrichDataWithCtagsInfo(data, cwd);
+    }
+    return data;
+}
+
 export function getDefinitions(symbol: string, cwd: string, regex: RegExp): any[] {
     const output = p.execSync(`${global()} -x ${symbol}`, { cwd });
     return parseGlobalOutput(output, regex, 'definition');
@@ -149,7 +164,7 @@ function buildFileSymbolMap(data: any[], cwd: string): Record<string, any[]> {
         processedFiles.add(item.filename);
 
         const output = p.execSync(`${ctags()} --fields=+neK -o - --sort=no ${item.filename}`, {
-            cwd,
+            cwd, maxBuffer: 10 * 1024 * 1024
         });
         fileMap[item.filename] = parseCtagsOutput(output);
     }
